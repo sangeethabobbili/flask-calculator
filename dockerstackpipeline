@@ -1,0 +1,29 @@
+node{
+    
+    def bn=BUILD_NUMBER
+    stage('SCM checkout'){
+        git branch: 'master', credentialsId: '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', url: 'https://github.com/sangeethabobbili/flask-calculator.git'
+        
+    }
+    stage('Build Docker Image'){
+        sh "docker build -t dockergeethaacc/flaskcalpipe:${bn} ."
+    }
+    stage('Push Docker Image'){
+        withCredentials([string(credentialsId: 'dockerhubpwd', variable: 'dockerhubpwd')]) {
+          sh "docker login -u dockergeethaacc -p ${dockerhubpwd}"
+        }
+        sh "docker push dockergeethaacc/flaskcalpipe:${bn}"
+     } 
+    stage('remove local images'){
+        sh "docker rmi -f dockergeethaacc/flaskcalpipe:${bn}"
+    }   
+    stage('Run Docker Image In Dev Server'){
+        
+     sshagent(['DOCKER_SERVER']) { 
+          //sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.15.166 rm –f docker-compose.yml || true'
+          sh "scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@172.31.15.166:/home/ubuntu/docker-compose.yml"
+          sh "sed -i 's/VERSION/${bn}/' docker-compose.yml"
+           sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.15.166 sudo docker stack deploy --compose-file docker-compose.yml flaskslack'
+     }
+    }
+}
