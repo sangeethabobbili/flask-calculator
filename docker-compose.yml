@@ -1,12 +1,12 @@
 version: '3.1'
 services:
   flaskapp:
-    image: dockergeethaacc/flaskcal:VERSION
+    image: dockergeethaacc/flaskcal:5
     restart: always
     ports:
-    - 3010:3000
+    - 3000:3000
     networks:
     - flaskappbridge
 networks:
   flaskappbridge:
-    driver: overlay
+    driver: bridge
