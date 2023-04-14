@@ -1,12 +1,10 @@
-version: '3.1'
+version: '3.3'
 services:
   flaskcal:
-    image: dockergeethaacc/flaskcal:VERSION
+    image: dockergeethaacc/flaskcalpipe:VERSION
     ports:
     - 3010:3000
     networks:
     - flasknw
-netwoks:
+networks:
   flasknw:
-volumes:
-   flaskvol:
